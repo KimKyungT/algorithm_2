@@ -1,0 +1,284 @@
+#include <stdio.h>
+#include<stdlib.h>
+#include<time.h>
+
+clock_t start, end;
+double t = 0;
+
+
+
+double exchange(int* arr, int n) {
+    start = clock();
+    int temp = 0;
+    for (int i = 0; i < (n - 1); i++)
+    {
+        for (int j = (i + 1); j < n; j++)
+        {
+            if (arr[i] > arr[j]) {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+    end = clock();
+    t = (double)(end - start) / CLOCKS_PER_SEC;
+    return t;
+}
+
+
+void merge(int* arr, int p, int q, int r) {
+
+   
+    int n1 = q - p + 1;
+    int n2 = r - q;
+
+    int* list1 = (int*)malloc(sizeof(int) * n1);
+    int* list2 = (int*)malloc(sizeof(int) * n2);
+
+    for (int i = 0; i < n1; i++)        list1[i] = arr[p + i];
+    for (int j = 0; j < n2; j++)        list2[j] = arr[q + 1 + j];
+
+    
+    int i, j, k;
+    i = 0;
+    j = 0;
+    k = p;
+
+    while (i < n1 && j < n2) {
+        if (list1[i] <= list2[j]) {
+            arr[k] = list1[i];
+            i++;
+        }
+        else {
+            arr[k] = list2[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = list1[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = list2[j];
+        j++;
+        k++;
+    }
+}
+
+
+void mergeSort(int* arr, int l, int r) {
+   
+    if (l < r) {
+
+        int m = l + (r - l) / 2;
+
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+
+        merge(arr, l, m, r);
+    }
+}
+
+double MergeSort(int* arr, int l, int r) {
+    start = clock();
+    mergeSort(arr, l, r);
+    end = clock();
+    t = (double)(end - start) / CLOCKS_PER_SEC;
+    return t;
+}
+
+
+int partition(int* array, int low, int high) {
+
+
+    int pivot = array[high];
+
+    int i = (low - 1);
+
+    for (int j = low; j < high; j++) {
+        if (array[j] <= pivot) {
+            i++;
+            int t = array[i];
+            array[i] = array[j];
+            array[j] = t;
+        }
+    }
+
+    int t = array[i+1];
+    array[i+1] = array[high];
+    array[high] = t;
+
+    return (i + 1);
+}
+
+void quickSort(int* array, int low, int high) {
+    if (low < high) {
+
+        int pi = partition(array, low, high);
+
+        quickSort(array, low, pi - 1);
+
+        quickSort(array, pi + 1, high);
+    }
+}
+double QuickSort(int* arr, int l, int r) {
+    start = clock();
+    quickSort(arr, l, r);
+    end = clock();
+    t = (double)(end - start) / CLOCKS_PER_SEC;
+  
+    return t;
+}
+
+void swap(int* a, int* b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+void heapify(int* arr, int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+
+    if (largest != i) {
+        swap(&arr[i], &arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+void heapSort(int* arr, int n) {
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    for (int i = n - 1; i >= 0; i--) {
+        swap(&arr[0], &arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
+
+double HeapSort(int* arr, int n) {
+    start = clock();
+    heapSort(arr, n);
+    end = clock();
+    t = (double)(end - start) / CLOCKS_PER_SEC;
+    return t;
+}
+
+
+
+int getlist2ax(int array[], int n) {
+    int max = array[0];
+    for (int i = 1; i < n; i++)
+        if (array[i] > max)
+            max = array[i];
+    return max;
+}
+
+void countingSort(int* array, int size, int place) {
+    int* output = (int*)malloc(sizeof(int) * (size + 1));
+
+    int count[10];
+
+    for (int i = 0; i < 10; i++)
+        count[i] = 0;
+
+    for (int i = 0; i < size; i++)
+        count[(array[i] / place) % 10]++;
+
+    for (int i = 1; i < 10; i++)
+        count[i] += count[i - 1];
+    for (int i = size - 1; i >= 0; i--) {
+        output[count[(array[i] / place) % 10] - 1] = array[i];// array[i]가 0인 경우 오류 발생
+        count[(array[i] / place) % 10]--;
+    }
+
+    for (int i = 0; i < size; i++)
+        array[i] = output[i];
+    free(output);
+}
+
+
+void radixsort(int array[], int size) {
+    int max = getlist2ax(array, size);
+
+    for (int place = 1; max / place > 0; place *= 10)
+        countingSort(array, size, place);
+}
+
+double RadixSort(int* arr, int n) {
+    start = clock();
+    radixsort(arr, n);
+    end = clock();
+    t = (double)(end - start) / CLOCKS_PER_SEC;
+    return t;
+}
+
+int main() {
+    double a = 0;
+    int n = 0;
+    printf("숫자 갯수를 입력하세요>>");
+    scanf_s("%d", &n);
+
+    int* test = (int*)malloc(sizeof(int) * (n));
+    srand(time(NULL));
+
+
+    double exe_time[5][5];
+    double real_time[5];
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < n; j++) {
+            test[j] = rand();
+        }
+        exe_time[0][i] = exchange(test, n);
+        printf("\n%d 번째: %f\n", i+1, exe_time[0][i]);
+        
+        for (int j = 0; j < n; j++) {
+            test[j] = rand();
+        }
+        exe_time[1][i] =MergeSort(test, 0, n - 1);
+        printf("%d 번째: %f\n", i+1, exe_time[1][i]);
+
+        for (int j = 0; j < n; j++) {
+            test[j] = rand();
+        }
+        exe_time[2][i]=QuickSort(test, 0, n - 1);
+        printf("%d 번째: %f\n", i+1, exe_time[2][i]);
+
+        for (int j = 0; j < n; j++) {
+            test[j] = rand();
+        }
+        exe_time[3][i] = HeapSort(test, n);
+        printf("%d 번째: %f\n", i+1, exe_time[3][i]);
+
+        for (int j = 0; j < n; j++) {
+            test[j] = rand();
+        }
+        exe_time[4][i]=RadixSort(test, n);
+        printf("%d 번째: %f\n", i + 1, exe_time[4][i]);
+    }
+
+    char* name[5] = { "Exchange sort:", "Merge sort   :", "Quick sort   :", "Heap sort    :", "Radix sort   :" };
+    for (int i = 0; i < 5; i++) {
+        double sum = 0;
+        for (int j = 0; j < 5; j++) {
+            sum += exe_time[i][j];
+        }
+        real_time[i] = sum/5;
+        printf("\n%s  %f\n",name[i], real_time[i]);
+    }
+
+    return 0;
+}
